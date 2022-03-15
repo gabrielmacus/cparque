@@ -1,7 +1,7 @@
 {
   "name": "cparque",
   "version": "1.0.0",
-  "homepage": "https://gabrielmacus.github.io/cparque",
+  "homepage": "https://gabrielmacus.github.io",
   "private": true,
   "dependencies": {
     "@ant-design/colors": "^6.0.0",
