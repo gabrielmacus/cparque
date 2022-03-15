@@ -8,8 +8,8 @@ import PublicadoresSave from './modules/publicadores/PublicadoresSave';
 
 
 const App = () => (
-  <BrowserRouter>
-              <Routes>
+  <BrowserRouter basename={process.env.REACT_APP_BASENAME}>
+              <Routes >
                 <Route path="/" element={<AsignacionesList />} />
                 <Route path="/asignaciones/guardar" element={<AsignacionesSave />} />
                 <Route path="/asignaciones/guardar/:id" element={<AsignacionesSave />} />
