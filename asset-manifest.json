@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/cparque/static/css/main.0788dd31.css",
-    "main.js": "/cparque/static/js/main.d2bb3996.js",
+    "main.js": "/cparque/static/js/main.e7609e77.js",
     "static/js/377.9babaeb7.chunk.js": "/cparque/static/js/377.9babaeb7.chunk.js",
     "service-worker.js": "/cparque/service-worker.js",
     "index.html": "/cparque/index.html",
     "main.0788dd31.css.map": "/cparque/static/css/main.0788dd31.css.map",
-    "main.d2bb3996.js.map": "/cparque/static/js/main.d2bb3996.js.map",
+    "main.e7609e77.js.map": "/cparque/static/js/main.e7609e77.js.map",
     "377.9babaeb7.chunk.js.map": "/cparque/static/js/377.9babaeb7.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.0788dd31.css",
-    "static/js/main.d2bb3996.js"
+    "static/js/main.e7609e77.js"
   ]
 }
