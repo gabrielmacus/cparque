@@ -1,4 +1,4 @@
-import { DatePicker, Form, Input, Radio, Select, Space } from "antd";
+import { DatePicker, Form, Input, Radio, Select, Space, Spin } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import DataSave from "../common/components/DataSave";
@@ -12,6 +12,7 @@ import locale from 'antd/es/date-picker/locale/es_ES'
 
 import usePublicadoresApi, { Publicador } from "../publicadores/usePublicadoresApi";
 import { useParams } from "react-router-dom";
+import styled from "styled-components";
 
 
 moment.updateLocale('es-mx', {
@@ -30,6 +31,19 @@ export interface AsignacionForm extends Partial<Omit<AsignacionSave,
     FechaSemana?:moment.Moment
 }
 
+
+const EmptyIntervenciones = styled.strong`
+text-align: center;
+    display: block;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    font-size: 0.7rem;
+    line-height: 1.2;
+`;
+
 export default () => {
     const {id} = useParams();
     
@@ -40,11 +54,14 @@ export default () => {
     const [intervencionesResponse, setIntervencionesResponse] = useState<ActionResult<Intervencion[]>>();
     const [publicadoresResponse, setPublicadoresResponse] = useState<ActionResult<Publicador[]>>();
     const [asignacion, setAsignacion] = useState<AsignacionForm>({});
+    const [loadingIntervenciones, setLoadingIntervenciones] = useState(false);
 
     const loadIntervenciones = async () => {
         if(asignacion.FechaSemana)
         {
+            setLoadingIntervenciones(true);
             setIntervencionesResponse(await intervencionesApi.list(moment(asignacion.FechaSemana).startOf("week")));
+            setLoadingIntervenciones(false);
         }
     };
 
@@ -166,20 +183,27 @@ export default () => {
                 name="IntervencionAsignada" 
                 rules={[{required:true, message:"Seleccione la intervención"}]} 
                 required>
-                   
-                    {/*intervencionesResponse?.data?.value && intervencionesResponse?.data?.value.length > 0 &&*/}
-                    <Radio.Group >
-                        <Space direction="vertical">
-                            {intervencionesResponse?.data?.value
-                            .map(i => ({...i,...{FechaSemana:moment(i.FechaSemana).toISOString()}}))
-                            .map(i => 
-                            <Radio 
-                            key={i.Descripcion}
-                            value={`${i.FechaSemana}_${i.Descripcion}`}>
-                                {i.Descripcion}
-                            </Radio>)}
-                        </Space>
-                    </Radio.Group>
+                    <Spin spinning={loadingIntervenciones} style={{minHeight:"40px",background:"rgba(255,255,255,0.5)"}} >
+                        {/*intervencionesResponse?.data?.value && intervencionesResponse?.data?.value.length > 0 &&*/}
+                        {(intervencionesResponse?.data?.value.length ?? 0) > 0 &&
+                        <Radio.Group >
+                            <Space direction="vertical">
+                                {intervencionesResponse?.data?.value
+                                .map(i => ({...i,...{FechaSemana:moment(i.FechaSemana).toISOString()}}))
+                                .map(i => 
+                                <Radio 
+                                key={i.Descripcion}
+                                value={`${i.FechaSemana}_${i.Descripcion}`}>
+                                    {i.Descripcion}
+                                </Radio>)}
+                            </Space>
+                        </Radio.Group>}
+                        {intervencionesResponse?.data?.value.length == 0 &&
+                        <EmptyIntervenciones>No hay intervenciones para mostrar en la semana seleccionada</EmptyIntervenciones>
+                        }
+                    </Spin>
+
+                    
 
                     {/*intervencionesResponse?.data?.value?.length == 0 && 
                     <strong style={{display:'block',textAlign:'center',background:'white',padding:'1rem'}}>No hay intervenciones en la fecha seleccionada</strong>

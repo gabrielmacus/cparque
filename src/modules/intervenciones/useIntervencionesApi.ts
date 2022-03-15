@@ -6,7 +6,7 @@ export interface Intervencion
     FechaSemana:string //Date
     Descripcion:string
     DescripcionHtml:string
-    Tipo:("OTRO"|"LECTURA"|"CONVERSACION"|"REVISITA"|"CURSO"|"DISCURSO")
+    Tipo:string //("OTRO"|"LECTURA"|"CONVERSACION"|"REVISITA"|"CURSO"|"DISCURSO")
     DuracionMins:number
     FuenteInformacionNombre:string
     FuenteInformacionLink:string

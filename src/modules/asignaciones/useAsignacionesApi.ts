@@ -43,7 +43,7 @@ export interface Asignacion extends Model
     IntervencionAsignada_FechaSemana:string //Date
     IntervencionAsignada_Descripcion:string
     IntervencionAsignada_DescripcionHtml:string
-    IntervencionAsignada_Tipo:("OTRO"|"LECTURA"|"CONVERSACION"|"REVISITA"|"CURSO"|"DISCURSO")
+    IntervencionAsignada_Tipo:string //("OTRO"|"LECTURA"|"CONVERSACION"|"REVISITA"|"CURSO"|"DISCURSO")
     IntervencionAsignada_DuracionMins:number
     IntervencionAsignada_FuenteInformacionNombre:string
     IntervencionAsignada_FuenteInformacionLink:string

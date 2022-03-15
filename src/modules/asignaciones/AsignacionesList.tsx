@@ -36,7 +36,7 @@ export default () => {
         
         setAsignacionesLoading(true);
         setAsigacionesResponse(await asignacionesApi.list({
-            $orderby:["Id desc"],
+            $orderby:["IntervencionAsignada_FechaSemana desc","Id desc"],
             $expand:["PublicadorAsignado","Ayudante"],
             $filter:filteredWeek ? [`IntervencionAsignada_FechaSemana eq ${filteredWeek}`]: []
         }));
