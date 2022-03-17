@@ -30,7 +30,8 @@ color:white;
 
 interface MainLayoutProps {
     children:React.ReactNode,
-    title?:string
+    title?:string,
+    maxContentWidth?:number
 }
 
 export default (props:MainLayoutProps) => {
@@ -42,7 +43,9 @@ export default (props:MainLayoutProps) => {
                 {props.title}
             </StyledHeader>
             <StyledContent>
-                {props.children}
+                <div style={{maxWidth:props.maxContentWidth ?? 1024,margin:'auto'}}>
+                    {props.children}
+                </div>
             </StyledContent>
         </Layout>
     );

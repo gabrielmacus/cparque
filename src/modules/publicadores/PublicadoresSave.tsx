@@ -1,9 +1,11 @@
 import { Form, Input } from "antd";
+import { useParams } from "react-router-dom";
 import DataSave from "../common/components/DataSave";
 import MainLayout from "../common/components/MainLayout";
 import usePublicadoresApi, { Publicador } from "./usePublicadoresApi";
 
 export default () => {
+    const {id} = useParams();
     const publicadoresApi = usePublicadoresApi();
 
     return (
@@ -13,6 +15,7 @@ export default () => {
                 save={publicadoresApi.save}
                 transformOnLoad={async (value) => value}
                 transformOnSave={async (value) => value}
+                id={id}
                 >
                     <Form.Item 
                     rules={[

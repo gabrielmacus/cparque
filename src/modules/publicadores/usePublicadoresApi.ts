@@ -15,6 +15,7 @@ export default ()  => {
     
     return {
         list:(query:Query)=>api.list!<Publicador>(query),
-        save:(data:Publicador)=>api.save!<Publicador,Publicador>(data)
+        save:(data:Partial<Publicador>)=>api.save!<Partial<Publicador>,Publicador>(data),
+        delete:(id:number)=>api.delete(id)
     };
 }

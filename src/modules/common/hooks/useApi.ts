@@ -62,7 +62,7 @@ export default (props:ApiProps):Api => {
         {
             qs.push("$count=true");
         }
-        if(query.$expand)
+        if(query.$expand && query.$expand.length)
         {
             qs.push(`$expand=${query.$expand.join(",")}`);
         }
@@ -83,7 +83,7 @@ export default (props:ApiProps):Api => {
 
         if(query.$filter && query.$filter.length > 0)
         {
-            qs.push(`$filter=${query.$filter.join("and")}`);
+            qs.push(`$filter=${query.$filter.join(" and ")}`);
         }
 
         return qs.join("&");
