@@ -1,3 +1,4 @@
+import { Asignacion } from "../asignaciones/useAsignacionesApi"
 import useApi, { Api, Model, Query } from "../common/hooks/useApi"
 
 export interface Publicador extends Model
@@ -6,6 +7,7 @@ export interface Publicador extends Model
     Apellido:string
     Celular?:string
     Fijo?:string
+    Asignaciones?:Asignacion[]
 }
 
 

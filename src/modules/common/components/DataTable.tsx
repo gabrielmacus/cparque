@@ -50,10 +50,10 @@ export interface DataTableProps <TModel extends Model,TSaveModel extends Partial
     $expand?:string[],
 
     defaultSortOrder?:string
-
     list:(query:Query) => Promise<ActionResult<TModel[]>>
     delete:(id:number) => Promise<ActionResult<any>>
 };
+
 
 const TableFooter = styled.div`
 display: flex;

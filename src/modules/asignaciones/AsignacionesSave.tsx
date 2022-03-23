@@ -66,7 +66,20 @@ export default () => {
     };
 
     const loadPublicadores = async () => {
-        setPublicadoresResponse(await publicadoresApi.list({$top:300,$orderby:["Apellido desc","Nombre desc"]}));
+        const response = await publicadoresApi.list({
+            $top:300,
+            $orderby:["Apellido desc","Nombre desc"],
+            $expand:["Asignaciones($orderby=IntervencionAsignada_FechaSemana desc,Id desc)"]
+        });
+        setPublicadoresResponse(response);
+    };
+
+    const orderByFechaAsignacion = (a:Publicador,b:Publicador):number => {
+        const ts_a = a.Asignaciones?.length ? moment(a.Asignaciones?.at(0)?.IntervencionAsignada_FechaSemana).unix() : 0;
+        const ts_b = b.Asignaciones?.length ? moment(b.Asignaciones?.at(0)?.IntervencionAsignada_FechaSemana).unix() : 0;
+
+        return (ts_a > ts_b) ? 1 : -1;
+
     };
 
     useEffect(()=>{
@@ -83,6 +96,7 @@ export default () => {
             <DataSave<Asignacion,AsignacionSave,AsignacionForm>
                 list={asignacionesApi.list}
                 save={asignacionesApi.save}
+                afterSave={()=>loadPublicadores()}
                 cancelText="Volver al listado"
                 cancelRoute={"/"}
                 id={id}
@@ -135,8 +149,16 @@ export default () => {
                     >
                         {publicadoresResponse?.data?.value
                         .filter(p => asignacion.AyudanteId != p.Id)
+                        .sort(orderByFechaAsignacion)
                         .map((publicador)=>
-                        <Select.Option  key={publicador.Id}  value={publicador.Id}>{publicador.Apellido} {publicador.Nombre}</Select.Option>
+                        <Select.Option  key={publicador.Id}  value={publicador.Id}>
+                            <div>{publicador.Apellido} {publicador.Nombre}</div>
+                            <strong>
+                                Última fecha: {publicador.Asignaciones?.length ? 
+                                `${moment(publicador.Asignaciones[0].IntervencionAsignada_FechaSemana).format("D/M/YYYY")} (${moment(publicador.Asignaciones[0].IntervencionAsignada_FechaSemana).fromNow()})` 
+                                : "-"}
+                            </strong>
+                        </Select.Option>
                         )}
                     </Select>
                 </Form.Item>
@@ -153,7 +175,9 @@ export default () => {
                         {publicadoresResponse?.data?.value
                         .filter(p => asignacion.PublicadorAsignadoId != p.Id)
                         .map((publicador)=>
-                        <Select.Option key={publicador.Id} value={publicador.Id}>{publicador.Apellido} {publicador.Nombre}</Select.Option>
+                        <Select.Option key={publicador.Id} value={publicador.Id}>
+                            {publicador.Apellido} {publicador.Nombre}
+                        </Select.Option>
                         )}
                     </Select>
                 </Form.Item>

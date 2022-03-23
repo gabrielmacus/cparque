@@ -19,6 +19,7 @@ interface DataSaveProps <TModel extends Model,TSaveModel extends Partial<Model>,
     cancelText?:string
     onLoadedItem?:(item:TModel, formItem:TFormModel)=>Promise<any>
     beforeLoadItem?:()=>any
+    afterSave?:()=>any
     //transformOnSubmit:(value:TSaveModel)=>Promise<PartialDeep<TModel>>
     transformOnLoad:(value:TModel)=>Promise<TFormModel>
     transformOnSave:(value:TFormModel)=>Promise<TSaveModel>
@@ -74,6 +75,8 @@ export default <TModel extends Model,TSaveModel extends Partial<Model>, TFormMod
             return;
         }
         setLoading(false);
+
+        props.afterSave?.();
         
 
     };

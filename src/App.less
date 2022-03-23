@@ -55,3 +55,39 @@ html, body, #root, main, .ant-layout {
     height: auto;
 	min-height: 100vh;;
 }
+
+
+.mobile-table {
+
+	table 
+	{
+		table-layout: auto;
+		display: block;
+	}
+
+	tbody
+	{
+		display: grid;
+    	width: 100%;
+    	grid-gap: 20px;
+
+	}
+
+	tr
+	{
+		display: grid;
+		width: 100%;
+		grid-template-columns: 1fr;
+		background: white;
+	}
+
+	colgroup,thead
+	{
+		display: none;
+	}
+	.ant-table
+	{
+		background: transparent;
+	}
+
+}
