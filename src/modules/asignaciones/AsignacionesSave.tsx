@@ -145,13 +145,14 @@ export default () => {
                     loading={!publicadoresResponse} 
                     allowClear
                     showSearch
-                    optionFilterProp="children"
+                    optionFilterProp="data-filter"
+                    
                     >
                         {publicadoresResponse?.data?.value
                         .filter(p => asignacion.AyudanteId != p.Id)
                         .sort(orderByFechaAsignacion)
                         .map((publicador)=>
-                        <Select.Option  key={publicador.Id}  value={publicador.Id}>
+                        <Select.Option data-filter={`${publicador.Apellido} ${publicador.Nombre}`} key={publicador.Id}  value={publicador.Id}>
                             <div>{publicador.Apellido} {publicador.Nombre}</div>
                             <strong>
                                 Última fecha: {publicador.Asignaciones?.length ? 

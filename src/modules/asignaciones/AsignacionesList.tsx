@@ -79,9 +79,15 @@ export default () => {
         </Form>
 
         <AsignacionList>
-            {asignacionesLoading && <Skeleton loading={true} active />}
+            {asignacionesLoading && 
+            <>
+            <Skeleton loading={true} active />
+            <Skeleton loading={true} active />
+            </>
+            }
             {!asignacionesLoading && asignacionesResponse?.data?.value.map(asignacion => 
             <AsignacionCard 
+            key={asignacion.Id}
             afterDelete={()=>loadItems()}
             asignacion={asignacion} />    
             )}
