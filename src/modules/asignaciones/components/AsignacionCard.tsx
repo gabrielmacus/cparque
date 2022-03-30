@@ -44,8 +44,9 @@ export default (props:AsignacionCardProps) => {
     const asignacionesApi = useAsignacionesApi();
 
     const sendWhatsapp = () => {
+        const ayudante = props.asignacion.Ayudante ? `*Ayudante:* ${props.asignacion.Ayudante?.Apellido} ${props.asignacion.Ayudante?.Nombre}%0a`:'';
         const whatsappMsg = `
-        *Aviso de asignación. Semana del ${moment(props.asignacion.IntervencionAsignada_FechaSemana).format("D/M/YYYY")}*%0a*Ayudante:* ${props.asignacion.Ayudante?.Apellido} ${props.asignacion.Ayudante?.Nombre}%0a*Sala:* ${props.asignacion.Sala}%0a*Intervención:* ${props.asignacion.IntervencionAsignada_Descripcion}
+        *Aviso de asignación. Semana del ${moment(props.asignacion.IntervencionAsignada_FechaSemana).format("D/M/YYYY")}*%0a${ayudante}*Sala:* ${props.asignacion.Sala}%0a*Intervención:* ${props.asignacion.IntervencionAsignada_Descripcion}
         `;
         window.open(`https://wa.me/${props.asignacion.PublicadorAsignado.Celular}?text=${whatsappMsg}`);
     };
