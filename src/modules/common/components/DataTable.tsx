@@ -60,6 +60,13 @@ display: flex;
 justify-content: space-between;
 `;
 
+const StyledTable = styled.div`
+& .ant-table
+{
+    overflow: auto;
+}
+`;
+
 const DataTable= <TModel extends Model,TSaveModel extends Partial<Model>>(props:DataTableProps<TModel,TSaveModel>) => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);

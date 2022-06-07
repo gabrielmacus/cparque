@@ -8,6 +8,9 @@ export interface Publicador extends Model
     Celular?:string
     Fijo?:string
     Asignaciones?:Asignacion[]
+    Grupo:number
+    PrecursorTipo:("PUBLICADOR"|"PRECURSOR_AUXILIAR"|"PRECURSOR_REGULAR"|"PRECURSOR_ESPECIAL")
+    ResponsabilidadTipo:("PUBLICADOR"|"SIERVO_MINISTERIAL"|"ANCIANO")
 }
 
 

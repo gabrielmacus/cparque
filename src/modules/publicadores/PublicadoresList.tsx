@@ -41,16 +41,16 @@ export default () => {
             <DataTable<Publicador,Publicador>
             list={api.list}
             delete={api.delete}
-            /*createAction={{
+            createAction={{
                 label:"Agregar publicador",
                 path:createPage
-            }}*/
+            }}
             deleteMultipleAction
             defaultSortOrder={"Apellido desc"}
             selectionType='checkbox'
             title={"Publicadores"}
             generateFilters={generateFilters}
-            //editItemAction={editPage}
+            editItemAction={editPage}
             deleteItemAction
             deleteItemActionConfirmMessage={(item) => `¿Eliminar a ${item.Apellido} ${item.Nombre}?`}
             defaultPageSize={25}
