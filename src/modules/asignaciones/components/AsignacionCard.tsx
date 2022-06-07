@@ -45,8 +45,9 @@ export default (props:AsignacionCardProps) => {
 
     const sendWhatsapp = () => {
         const ayudante = props.asignacion.Ayudante ? `*Ayudante:* ${props.asignacion.Ayudante?.Apellido} ${props.asignacion.Ayudante?.Nombre}%0a`:'';
+        const publicador = `*Publicador asignado:* ${props.asignacion.PublicadorAsignado.Apellido} ${props.asignacion.PublicadorAsignado.Nombre}%0a`;
         const sala = {"PRINCIPAL":"Principal","AUXILIAR_1":"Auxiliar 1","AUXILIAR_2":"Auxiliar 2"}[props.asignacion.Sala];
-        const whatsappMsg = `*Aviso de asignación. Semana del ${moment(props.asignacion.IntervencionAsignada_FechaSemana).format("D/M/YYYY")}*%0a${ayudante}*Sala:* ${sala}%0a*Intervención:* ${props.asignacion.IntervencionAsignada_Descripcion}%0a%0a*Cualquier inconveniente, avisar con tiempo. Desde ya muchas gracias.*`;
+        const whatsappMsg = `*Aviso de asignación. Semana del ${moment(props.asignacion.IntervencionAsignada_FechaSemana).format("D/M/YYYY")}*%0a${publicador}${ayudante}*Sala:* ${sala}%0a*Intervención:* ${props.asignacion.IntervencionAsignada_Descripcion}%0a%0a*Cualquier inconveniente, avisar con tiempo. Desde ya muchas gracias.*`;
         window.open(`https://wa.me/${props.asignacion.PublicadorAsignado.Celular}?text=${whatsappMsg}`);
     };
 

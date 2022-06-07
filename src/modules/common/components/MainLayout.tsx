@@ -47,6 +47,15 @@ display:block;
 color:inherit;
 padding:0.5rem 1rem 0.5rem 1rem;
 font-weight: 600;
+font-size:1.1rem;
+&:first-child
+{
+    padding-top:1rem;
+}
+&:last-child
+{
+    padding-bottom:1rem;
+}
 `;
 
 const MenuItems = styled.div`
