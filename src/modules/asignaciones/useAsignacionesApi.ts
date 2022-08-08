@@ -35,7 +35,7 @@ import { Publicador } from "../publicadores/usePublicadoresApi";
 
 export interface Asignacion extends Model
 {
-    PublicadorAsignado: Publicador
+    PublicadorAsignado?: Publicador
     Ayudante?: Publicador
     //IntervencionAsignada: Intervencion
     Sala : ("PRINCIPAL"|"AUXILIAR_1"|"AUXILIAR_2")
