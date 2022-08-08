@@ -109,7 +109,7 @@ export default () => {
                         ...value,
                         ...{
                             AyudanteId:value.Ayudante?.Id,
-                            PublicadorAsignadoId:value.PublicadorAsignado.Id,
+                            PublicadorAsignadoId:value.PublicadorAsignado?.Id,
                             FechaSemana:moment(value.IntervencionAsignada_FechaSemana),
                             IntervencionAsignada: `${moment(value.IntervencionAsignada_FechaSemana).toISOString()}_${value.IntervencionAsignada_Descripcion}`
                         }
