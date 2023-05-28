@@ -33,12 +33,14 @@ import useApi, { Api, Model, Query } from "../common/hooks/useApi"
 import { Intervencion } from "../intervenciones/useIntervencionesApi";
 import { Publicador } from "../publicadores/usePublicadoresApi";
 
+export type SalaAsignacion = ("PRINCIPAL"|"AUXILIAR_1"|"AUXILIAR_2");
+
 export interface Asignacion extends Model
 {
     PublicadorAsignado?: Publicador
     Ayudante?: Publicador
     //IntervencionAsignada: Intervencion
-    Sala : ("PRINCIPAL"|"AUXILIAR_1"|"AUXILIAR_2")
+    Sala : SalaAsignacion
 
     IntervencionAsignada_FechaSemana:string //Date
     IntervencionAsignada_Descripcion:string

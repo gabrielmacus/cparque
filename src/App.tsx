@@ -7,6 +7,7 @@ import AsignacionesSave from './modules/asignaciones/AsignacionesSave';
 import PublicadoresSave from './modules/publicadores/PublicadoresSave';
 import PublicadoresList from './modules/publicadores/PublicadoresList';
 import ReunionEntresemana from './modules/asignaciones/ReunionEntresemana';
+import ProgramaSave from './modules/programa/ProgramaSave';
 
 
 const App = () => (
@@ -21,6 +22,8 @@ const App = () => (
                 <Route path="/publicadores/guardar/:id" element={<PublicadoresSave />} />
 
                 <Route path="/asignaciones/entresemana" element={<ReunionEntresemana />} />
+
+                <Route path="/programa" element={<ProgramaSave />} />
 
               </Routes>
     </HashRouter>

@@ -104,6 +104,7 @@ export default (props: MainLayoutProps) => {
                     <MenuItem href="/#/asignaciones/guardar">Nueva asignación</MenuItem>
                     <MenuItem href="/#/publicadores">Ver publicadores</MenuItem>
                     <MenuItem href="/#/publicadores/guardar">Nuevo publicador</MenuItem>
+                    <MenuItem href="/#/programa">Programa</MenuItem>
                 </MenuItems>
             </Drawer>
         </Layout>

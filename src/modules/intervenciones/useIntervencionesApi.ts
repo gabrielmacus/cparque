@@ -1,5 +1,6 @@
 import moment from "moment";
 import useApi from "../common/hooks/useApi";
+import { ResponsabilidadTipo } from "../publicadores/usePublicadoresApi";
 
 export interface Intervencion
 {
@@ -10,6 +11,10 @@ export interface Intervencion
     DuracionMins:number
     FuenteInformacionNombre:string
     FuenteInformacionLink:string
+    Seccion:string
+    TiposResponsabilidadExcluidos?: ResponsabilidadTipo[]
+    PermiteAyudante:boolean
+    MultiSala:boolean
 }
 
 
