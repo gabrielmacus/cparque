@@ -22,14 +22,12 @@ moment.updateLocale('es-mx', {
 });
 
 export default () => {
-    const [fechaSemana, setFechaSemana] = useState<moment.Moment | null | undefined>(moment());
-    const [loading, setLoading] = useState<boolean>(false);
+    const [fechaSemana, setFechaSemana] = useState<Date | null | undefined>(moment().startOf("week").toDate());
     const [notificationApi, notificationContext] = notification.useNotification();
     const asignacionesApi = useAsignacionesApi();
 
 
     const onSaveAsignaciones = async (asignaciones: AsignacionSave[]) => {
-        setLoading(true);
         notificationApi.info({
             message: `Guardando asignaciones`,
             placement: 'bottomRight'
@@ -41,7 +39,6 @@ export default () => {
                     message: `Error al guardar una asignación. Contacte un administrador`,
                     placement: 'bottomRight'
                 });
-                setLoading(false);
                 return;
             }
         }
@@ -49,7 +46,6 @@ export default () => {
             message: `Asignaciones guardadas con éxito`,
             placement: 'bottomRight'
         });
-        setLoading(false);
     }
 
 
@@ -57,8 +53,10 @@ export default () => {
         <MainLayout title={"Programa"}>
             {notificationContext}
             <DatePicker
-                value={fechaSemana}
-                onChange={(value) => setFechaSemana(moment(value).startOf('week'))}
+                value={moment(fechaSemana)}
+                onChange={(value) => {
+                    setFechaSemana(moment(value).startOf('week').toDate())
+                }}
                 style={{ width: '100%', marginBottom: '1rem' }}
                 format={(value) => {
                     return value.startOf('week').format("MMMM") == value.endOf('week').format("MMMM") ?
@@ -69,7 +67,7 @@ export default () => {
                 allowClear={false}
                 locale={locale}
                 picker="week" />
-            {fechaSemana && <ProgramaViewer loading={loading} onSave={onSaveAsignaciones} fechaSemana={fechaSemana} />}
+            {fechaSemana && <ProgramaViewer  onSave={onSaveAsignaciones} fechaSemana={fechaSemana} />}
 
         </MainLayout>
     );

@@ -6,6 +6,9 @@ import { Publicador } from "../../publicadores/usePublicadoresApi";
 export interface PublicadorSelectProps { 
     publicadores?:Publicador[]
     tipoAsignacion:string
+    tiposResponsabilidadExcluidos?:string[]
+    value?:any
+    onChange?:(value:any)=>any
 }
 
 export default (props: PublicadorSelectProps) => {
@@ -26,6 +29,7 @@ export default (props: PublicadorSelectProps) => {
     };
 
     return (
+        <>
         <Select
             loading={!props.publicadores}
             showSearch
@@ -35,10 +39,13 @@ export default (props: PublicadorSelectProps) => {
                 return fullName.toLowerCase().includes(input.toLowerCase())
             }
             }
+            value={props.value}
+            onChange={props.onChange}
             allowClear
             placeholder="Sin asignar">
             {props.publicadores
                 ?.sort(orderPublicadoresByFechaAsignacion(props.tipoAsignacion))
+                .filter(p => !props.tiposResponsabilidadExcluidos?.includes(p.ResponsabilidadTipo))
                 .map(p =>
                     <Select.Option key={p.Id} value={p.Id}>
                         <div>{p.Apellido} {p.Nombre}</div>
@@ -52,5 +59,6 @@ export default (props: PublicadorSelectProps) => {
                         </div>
                     </Select.Option>)}
         </Select>
+        </>
     )
 };

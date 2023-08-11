@@ -9,6 +9,8 @@ import useIntervencionesApi, { Intervencion } from "../../intervenciones/useInte
 import usePublicadoresApi, { Publicador } from "../../publicadores/usePublicadoresApi";
 import PublicadorSelect from "./PublicadorSelect";
 
+
+
 const Viewer = styled.div`
 
     padding: 1.5rem;
@@ -122,8 +124,8 @@ const Viewer = styled.div`
 `;
 
 export interface ProgramaViewerProps {
-    fechaSemana: moment.Moment
-    onSave?: (value: AsignacionSave[]) => any
+    fechaSemana: Date
+    onSave?: (value: AsignacionSave[]) => Promise<any>
     loading?: boolean
 }
 
@@ -133,6 +135,7 @@ export interface Programa {
 
 export default (props: ProgramaViewerProps) => {
     const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
 
     const publicadoresApi = usePublicadoresApi();
     const [publicadoresResponse, setPublicadoresResponse] = useState<ActionResult<Publicador[]>>();
@@ -248,19 +251,6 @@ export default (props: ProgramaViewerProps) => {
         ])
     }
 
-
-    const orderPublicadoresByFechaAsignacion = (asignacionType: string) => {
-
-        return (a: Publicador, b: Publicador): number => {
-            const ts_a = a.Asignaciones?.filter(a => a.IntervencionAsignada_Tipo == asignacionType)?.length ? moment(a.Asignaciones?.filter(a => a.IntervencionAsignada_Tipo == asignacionType).at(0)?.IntervencionAsignada_FechaSemana).unix() : 0;
-            const ts_b = b.Asignaciones?.filter(a => a.IntervencionAsignada_Tipo == asignacionType)?.length ? moment(b.Asignaciones?.filter(a => a.IntervencionAsignada_Tipo == asignacionType).at(0)?.IntervencionAsignada_FechaSemana).unix() : 0;
-
-            if (ts_a == ts_b) return 0
-
-            return (ts_a > ts_b) ? 1 : -1;
-        };
-    };
-
     const sendReminder = (reunion: string, sala: string, descripcion: string, asignacion: AsignacionSave, esAyudante?: boolean) => {
         const publicadorId = esAyudante ? asignacion.AyudanteId : asignacion.PublicadorAsignadoId
         if (!publicadorId) {
@@ -296,16 +286,22 @@ export default (props: ProgramaViewerProps) => {
         if (props.fechaSemana) {
             setLoading(true);
             form.resetFields();
-            const intervencionesResult = await intervencionesApi.list(props.fechaSemana);
+            const intervencionesResult = await intervencionesApi.list(moment(props.fechaSemana));
             loadIntervenciones(intervencionesResult);
 
-            const asignacionesResult = await asignacionesApi.list({ $top: 1000, $filter: [`IntervencionAsignada_FechaSemana eq ${props.fechaSemana.format("YYYY-MM-DD")}`] })
+            const asignacionesResult = await asignacionesApi.list({ $top: 1000, $filter: [`IntervencionAsignada_FechaSemana eq ${moment(props.fechaSemana).format("YYYY-MM-DD")}`] })
             loadAsignaciones(asignacionesResult);
 
             setLoading(false);
         }
     }
 
+    const save = async (programa: Programa) => {
+        setSaving(true);
+        await props.onSave?.(asignacionesResult)
+        setSaving(false);
+        loadData();
+    }
     useEffect(() => {
         loadData();
     }, [props.fechaSemana]);
@@ -316,7 +312,7 @@ export default (props: ProgramaViewerProps) => {
                 layout="vertical"
                 onFieldsChange={onFieldsChange}
                 form={form}
-                onFinish={() => props.onSave?.(asignacionesResult)}
+                onFinish={(programa) => save(programa)}
             >
                 <Tabs style={{ paddingBottom: 20 }}>
                     {(["ENTRE_SEMANA", "FIN_SEMANA"] as ReunionAsignacion[]).map(
@@ -361,7 +357,9 @@ export default (props: ProgramaViewerProps) => {
                                                                                     style={{ margin: 0 }} >
                                                                                     <PublicadorSelect
                                                                                         publicadores={publicadoresResponse?.data?.value}
-                                                                                        tipoAsignacion={i.Tipo} />
+                                                                                        tipoAsignacion={i.Tipo}
+                                                                                        tiposResponsabilidadExcluidos={i.TiposResponsabilidadExcluidos}
+                                                                                    />
 
                                                                                 </Form.Item>
                                                                                 <Button
@@ -385,7 +383,9 @@ export default (props: ProgramaViewerProps) => {
                                                                                         style={{ margin: 0 }} >
                                                                                         <PublicadorSelect
                                                                                             publicadores={publicadoresResponse?.data?.value}
-                                                                                            tipoAsignacion={i.Tipo} />
+                                                                                            tipoAsignacion={i.Tipo}
+                                                                                            tiposResponsabilidadExcluidos={i.TiposResponsabilidadExcluidos}
+                                                                                        />
                                                                                     </Form.Item>
                                                                                     <Button
                                                                                         type="primary"
@@ -416,7 +416,7 @@ export default (props: ProgramaViewerProps) => {
                 </Tabs>
 
 
-                <Button loading={props.loading} htmlType="submit">Guardar</Button>
+                <Button loading={loading || saving} htmlType="submit">Guardar</Button>
             </Form>
 
         </Viewer>
