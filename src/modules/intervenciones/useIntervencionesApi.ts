@@ -1,9 +1,11 @@
 import moment from "moment";
+import { ReunionAsignacion } from "../asignaciones/useAsignacionesApi";
 import useApi from "../common/hooks/useApi";
 import { ResponsabilidadTipo } from "../publicadores/usePublicadoresApi";
 
 export interface Intervencion
 {
+    ReunionCorrespondiente:number
     FechaSemana:string //Date
     Descripcion:string
     DescripcionHtml:string

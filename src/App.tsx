@@ -13,7 +13,9 @@ import ProgramaSave from './modules/programa/ProgramaSave';
 const App = () => (
   <HashRouter basename={process.env.REACT_APP_BASENAME}>
               <Routes >
-                <Route path="/" element={<AsignacionesList />} />
+                {/*<Route path="/" element={<AsignacionesList />} /> */}
+                <Route path="/" element={<ProgramaSave />} />
+
                 <Route path="/asignaciones/guardar" element={<AsignacionesSave />} />
                 <Route path="/asignaciones/guardar/:id" element={<AsignacionesSave />} />
 

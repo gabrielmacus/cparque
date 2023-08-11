@@ -34,9 +34,10 @@ import { Intervencion } from "../intervenciones/useIntervencionesApi";
 import { Publicador } from "../publicadores/usePublicadoresApi";
 
 export type SalaAsignacion = ("PRINCIPAL"|"AUXILIAR_1"|"AUXILIAR_2");
-
+export type ReunionAsignacion = ("ENTRE_SEMANA" | "FIN_SEMANA")
 export interface Asignacion extends Model
 {
+    ReunionCorrespondiente:ReunionAsignacion
     PublicadorAsignado?: Publicador
     Ayudante?: Publicador
     //IntervencionAsignada: Intervencion

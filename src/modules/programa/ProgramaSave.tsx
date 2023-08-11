@@ -22,7 +22,7 @@ moment.updateLocale('es-mx', {
 });
 
 export default () => {
-    const [fechaSemana, setFechaSemana] = useState<moment.Moment | null | undefined>();
+    const [fechaSemana, setFechaSemana] = useState<moment.Moment | null | undefined>(moment());
     const [loading, setLoading] = useState<boolean>(false);
     const [notificationApi, notificationContext] = notification.useNotification();
     const asignacionesApi = useAsignacionesApi();
@@ -57,6 +57,7 @@ export default () => {
         <MainLayout title={"Programa"}>
             {notificationContext}
             <DatePicker
+                value={fechaSemana}
                 onChange={(value) => setFechaSemana(moment(value).startOf('week'))}
                 style={{ width: '100%', marginBottom: '1rem' }}
                 format={(value) => {
@@ -65,7 +66,7 @@ export default () => {
                         `${value.startOf('week').format("D")} de ${value.startOf('week').format("MMMM")} al ${value.endOf('week').format("D")} de ${value.endOf('week').format("MMMM")}`
                         ;
                 }}
-
+                allowClear={false}
                 locale={locale}
                 picker="week" />
             {fechaSemana && <ProgramaViewer loading={loading} onSave={onSaveAsignaciones} fechaSemana={fechaSemana} />}
