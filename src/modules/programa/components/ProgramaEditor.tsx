@@ -7,6 +7,7 @@ import useAsignacionesApi, { Asignacion, AsignacionSave, ReunionAsignacion, Sala
 import { ActionResult } from "../../common/hooks/useApi";
 import useIntervencionesApi, { Intervencion } from "../../intervenciones/useIntervencionesApi";
 import usePublicadoresApi, { Publicador } from "../../publicadores/usePublicadoresApi";
+import PublicadorSelect from "./PublicadorSelect";
 
 const Viewer = styled.div`
 
@@ -358,32 +359,9 @@ export default (props: ProgramaViewerProps) => {
                                                                                     //rules={sala == 'PRINCIPAL' ? [{ required: true }] : []}
                                                                                     name={["Asignaciones", reunion, i.Descripcion, sala, "PublicadorAsignadoId"]}
                                                                                     style={{ margin: 0 }} >
-                                                                                    <Select
-                                                                                        showSearch
-                                                                                        filterOption={(input, option) => {
-                                                                                            const fullName: string = option?.children?.[0]?.props?.children.join("")
-                                                                                            //@ts-ignore
-                                                                                            return fullName.toLowerCase().includes(input.toLowerCase())
-                                                                                        }
-                                                                                        }
-                                                                                        allowClear
-                                                                                        placeholder="Sin asignar">
-                                                                                        {publicadoresResponse?.data?.value
-                                                                                            .filter(p => !i.TiposResponsabilidadExcluidos?.includes(p.ResponsabilidadTipo))
-                                                                                            .sort(orderPublicadoresByFechaAsignacion(i.Tipo))
-                                                                                            .map(p =>
-                                                                                                <Select.Option key={p.Id} value={p.Id}>
-                                                                                                    <div>{p.Apellido} {p.Nombre}</div>
-                                                                                                    <strong>
-                                                                                                        Última asignación:
-                                                                                                    </strong>
-                                                                                                    <div>
-                                                                                                        {p.Asignaciones?.length ?
-                                                                                                            `${p.Asignaciones[0].IntervencionAsignada_Tipo} - Semana del ${moment(p.Asignaciones[0].IntervencionAsignada_FechaSemana).format("D/M/YYYY")} (${moment(p.Asignaciones[0].IntervencionAsignada_FechaSemana).fromNow()})`
-                                                                                                            : "-"}
-                                                                                                    </div>
-                                                                                                </Select.Option>)}
-                                                                                    </Select>
+                                                                                    <PublicadorSelect
+                                                                                        publicadores={publicadoresResponse?.data?.value}
+                                                                                        tipoAsignacion={i.Tipo} />
 
                                                                                 </Form.Item>
                                                                                 <Button
@@ -405,29 +383,9 @@ export default (props: ProgramaViewerProps) => {
                                                                                         label="Ayudante"
                                                                                         name={["Asignaciones", reunion, i.Descripcion, sala, "AyudanteId"]}
                                                                                         style={{ margin: 0 }} >
-                                                                                        <Select
-                                                                                            showSearch
-                                                                                            filterOption={(input, option) => {
-                                                                                                const fullName: string = option?.children?.[0]?.props?.children.join("")
-                                                                                                //@ts-ignore
-                                                                                                return fullName.toLowerCase().includes(input.toLowerCase())
-                                                                                            }
-                                                                                            }
-                                                                                            allowClear
-                                                                                            placeholder="Sin asignar">
-                                                                                            {publicadoresResponse?.data?.value
-                                                                                                .filter(p => !i.TiposResponsabilidadExcluidos?.includes(p.ResponsabilidadTipo))
-                                                                                                .sort(orderPublicadoresByFechaAsignacion(i.Tipo))
-                                                                                                .map(p =>
-                                                                                                    <Select.Option key={p.Id} value={p.Id}>
-                                                                                                        <div>{p.Apellido} {p.Nombre}</div>
-                                                                                                        <strong>
-                                                                                                            Última asignación: {p.Asignaciones?.length ?
-                                                                                                                `${p.Asignaciones[0].IntervencionAsignada_Tipo} - Semana del ${moment(p.Asignaciones[0].IntervencionAsignada_FechaSemana).format("D/M/YYYY")} (${moment(p.Asignaciones[0].IntervencionAsignada_FechaSemana).fromNow()})`
-                                                                                                                : "-"}
-                                                                                                        </strong>
-                                                                                                    </Select.Option>)}
-                                                                                        </Select>
+                                                                                        <PublicadorSelect
+                                                                                            publicadores={publicadoresResponse?.data?.value}
+                                                                                            tipoAsignacion={i.Tipo} />
                                                                                     </Form.Item>
                                                                                     <Button
                                                                                         type="primary"
