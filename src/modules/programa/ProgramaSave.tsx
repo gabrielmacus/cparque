@@ -11,6 +11,7 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import ProgramaViewer from "./components/ProgramaEditor";
 import useAsignacionesApi, { AsignacionSave } from "../asignaciones/useAsignacionesApi";
+import useProgramaApi from './useProgramaApi';
 import { useForm } from "antd/es/form/Form";
 
 
@@ -25,8 +26,58 @@ export default () => {
     const [fechaSemana, setFechaSemana] = useState<Date | null | undefined>(moment().startOf("week").toDate());
     const [notificationApi, notificationContext] = notification.useNotification();
     const asignacionesApi = useAsignacionesApi();
+    const programaApi = useProgramaApi();
+
+    const onShare = async () => {
+        const fechaSemanaMoment = moment(fechaSemana);
+        try {
+            const file = await programaApi.generateImage(fechaSemanaMoment);
+
+            const shareData: ShareData = {
+                title: `Programa ${fechaSemanaMoment.format("DD-MM-YYYY")}`,
+                files: [file]
+            };
+
+            if (navigator.canShare(shareData)) {
+                await navigator.share(shareData);
+            }
+            else {
+                const url = URL.createObjectURL(file)
+                const a = document.createElement("a");
+                a.download = file.name;
+                a.href = url;
+                a.click();
+                document.removeChild(a);
+            }
+        }
+        catch
+        {
+            notificationApi.error({
+                message: `Error al compartir el programa. Contacte un administrador`,
+                placement: 'bottomRight'
+            });
+            return;
+        }
 
 
+    }
+    const onSaveAsignacion = async (asignacion: AsignacionSave) => {
+        const result = await asignacionesApi.save(asignacion);
+        if (result.error) {
+            notificationApi.error({
+                message: `Error al guardar la asignación. Contacte un administrador`,
+                placement: 'bottomRight'
+            });
+            return;
+        }
+        notificationApi.success({
+            message: `Asignación guardada con éxito`,
+            placement: 'bottomRight',
+            duration: 1
+        });
+    };
+
+    /*
     const onSaveAsignaciones = async (asignaciones: AsignacionSave[]) => {
         notificationApi.info({
             message: `Guardando asignaciones`,
@@ -46,7 +97,7 @@ export default () => {
             message: `Asignaciones guardadas con éxito`,
             placement: 'bottomRight'
         });
-    }
+    }*/
 
 
     return (
@@ -67,7 +118,7 @@ export default () => {
                 allowClear={false}
                 locale={locale}
                 picker="week" />
-            {fechaSemana && <ProgramaViewer  onSave={onSaveAsignaciones} fechaSemana={fechaSemana} />}
+            {fechaSemana && <ProgramaViewer onShare={onShare} onSaveAsignacion={onSaveAsignacion} fechaSemana={fechaSemana} />}
 
         </MainLayout>
     );

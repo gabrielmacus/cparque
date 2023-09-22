@@ -1,4 +1,5 @@
 import { Button, Collapse, Form, Input, message, Select, Skeleton, Tabs } from "antd";
+import { ShareAltOutlined } from '@ant-design/icons';
 
 import moment from "moment";
 import { useEffect, useState } from "react";
@@ -125,7 +126,9 @@ const Viewer = styled.div`
 
 export interface ProgramaViewerProps {
     fechaSemana: Date
-    onSave?: (value: AsignacionSave[]) => Promise<any>
+    /*onSave?: (value: AsignacionSave[]) => Promise<any>*/
+    onSaveAsignacion?: (value:AsignacionSave) => Promise<any>
+    onShare?: () => Promise<any>
     loading?: boolean
 }
 
@@ -134,6 +137,8 @@ export interface Programa {
 }
 
 export default (props: ProgramaViewerProps) => {
+    const [sharing, setSharing] = useState(false);
+
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
 
@@ -151,9 +156,11 @@ export default (props: ProgramaViewerProps) => {
     const [sections, setSections] = useState<{ name: string, intervenciones: Intervencion[], reunionCorrespondiente: ReunionAsignacion }[]>([]);
     const [asignacionesResult, setAsignacionesResult] = useState<AsignacionSave[]>([]);
 
-    const onFieldsChange = () => {
+    const onFieldsChange = async (changedFields:any[]) => {
         const programa = form.getFieldsValue();
         const newAsignaciones: AsignacionSave[] = [];
+        let changedAsignacion:AsignacionSave; 
+
         for (const reunion in programa.Asignaciones) {
             for (const descripcion in programa.Asignaciones[reunion]) {
                 const asignaciones = programa.Asignaciones[reunion][descripcion];
@@ -163,7 +170,8 @@ export default (props: ProgramaViewerProps) => {
                     const intervencion = intervencionesResponse?.data?.value.filter(i => i.Descripcion == descripcion).at(0);
 
                     if (!intervencion) continue;
-                    newAsignaciones.push({
+
+                    const newAsignacion = {
                         ...asignacion,
                         ...{
                             ReunionCorrespondiente: reunion as ReunionAsignacion,
@@ -176,12 +184,22 @@ export default (props: ProgramaViewerProps) => {
                             IntervencionAsignada_Tipo: intervencion.Tipo,
                             Sala: sala as SalaAsignacion
                         }
-                    });
+                    };
+
+                    newAsignaciones.push(newAsignacion);
+
+                    if(changedFields[0].name.join(".").includes(`${reunion}.${intervencion.Descripcion}.${sala}`))
+                    {
+                        changedAsignacion = newAsignacion;
+                    }
+        
 
                 }
             }
         }
+
         setAsignacionesResult(newAsignaciones);
+        await props.onSaveAsignacion?.(changedAsignacion!);
     };
 
     const loadAsignaciones = async (result: ActionResult<Asignacion[]>) => {
@@ -257,7 +275,31 @@ export default (props: ProgramaViewerProps) => {
     }
 
     const sendReminder = (reunion: string, sala: string, descripcion: string, asignacion: AsignacionSave, esAyudante?: boolean) => {
-        const publicadorId = esAyudante ? asignacion.AyudanteId : asignacion.PublicadorAsignadoId
+        if ((esAyudante && !asignacion.AyudanteId) || (!esAyudante && !asignacion.PublicadorAsignadoId))
+        {
+            message.warning("Seleccione un publicador")
+            return;
+        }
+        
+        const publicador =  publicadoresResponse?.data?.value.filter(p => p.Id == asignacion.PublicadorAsignadoId).at(0);
+        const ayudante =  publicadoresResponse?.data?.value.filter(p => p.Id == asignacion.AyudanteId).at(0);
+        const receiver = esAyudante ? ayudante : publicador;
+
+        if (!receiver?.Celular) {
+            message.error("El publicador no tiene un número celular asignado")
+            return;
+        }
+        
+        //const calendarReminderDate = moment(asignacion.IntervencionAsignada_FechaSemana).subtract(2,'days');
+        //const addToCalendarLink = encodeURI(`https://calendar.google.com/calendar/render?action=TEMPLATE&dates=${calendarReminderDate.format("YYYYMMDD")}T030000Z%2F${calendarReminderDate.format("YYYYMMDD")}T030000Z&details=&location=&text=Aviso de asignación. Semana del ${moment(props.fechaSemana).format("D/M/YYYY")}`);
+        const ayudanteText = ayudante ? `*Ayudante:* ${ayudante?.Apellido} ${ayudante?.Nombre}%0a` : '';
+        const publicadorText = `*Publicador asignado:* ${publicador!.Apellido} ${publicador!.Nombre}%0a`;
+        const salaText = { "PRINCIPAL": "Principal", "AUXILIAR_1": "Auxiliar 1", "AUXILIAR_2": "Auxiliar 2" }[sala];
+        const whatsappMsg = `*Aviso de asignación. Semana del ${moment(props.fechaSemana).format("DD/MM/YYYY")}*%0a${publicadorText}${ayudanteText}*Sala:* ${salaText}%0a*Intervención:* ${descripcion} - ${{ 'ENTRE_SEMANA': 'Reunión de entre semana', 'FIN_SEMANA': 'Reunión de fin de semana' }[reunion]}%0a%0a*Cualquier inconveniente, avisar con tiempo. Desde ya muchas gracias.*`;
+        console.log(whatsappMsg)
+        window.open(`https://wa.me/${publicador!.Celular}?text=${whatsappMsg}`);
+        
+        /*const publicadorId = esAyudante ? asignacion.AyudanteId : asignacion.PublicadorAsignadoId
         if (!publicadorId) {
             message.warning("Seleccione un publicador")
             return;
@@ -271,10 +313,10 @@ export default (props: ProgramaViewerProps) => {
         }
 
         const ayudanteText = ayudante ? `*Ayudante:* ${ayudante?.Apellido} ${ayudante?.Nombre}%0a` : '';
-        const publicadorText = `*Publicador asignado:* ${publicador!.Apellido} ${publicador!.Nombre}%0a`;
+        const publicadorText = esAyudante ? `*Publicador asignado:* ${asignacion.} ${publicador!.Nombre}%0a` : `*Publicador asignado:* ${publicador!.Apellido} ${publicador!.Nombre}%0a`;
         const salaText = { "PRINCIPAL": "Principal", "AUXILIAR_1": "Auxiliar 1", "AUXILIAR_2": "Auxiliar 2" }[sala];
         const whatsappMsg = `*Aviso de asignación. Semana del ${moment(props.fechaSemana).format("D/M/YYYY")}*%0a${publicadorText}${ayudanteText}*Sala:* ${salaText}%0a*Intervención:* ${descripcion} - ${{ 'ENTRE_SEMANA': 'Reunión de entre semana', 'FIN_SEMANA': 'Reunión de fin de semana' }[reunion]}%0a%0a*Cualquier inconveniente, avisar con tiempo. Desde ya muchas gracias.*`;
-        window.open(`https://wa.me/${publicador!.Celular}?text=${whatsappMsg}`);
+        window.open(`https://wa.me/${publicador!.Celular}?text=${whatsappMsg}`);*/
     };
 
 
@@ -300,13 +342,22 @@ export default (props: ProgramaViewerProps) => {
             setLoading(false);
         }
     }
-
+    
+    /*
     const save = async (programa: Programa) => {
         setSaving(true);
         await props.onSave?.(asignacionesResult)
         setSaving(false);
         loadData();
+    }*/
+
+    const onShare = async () => {
+        setSharing(true);
+        await props.onShare!();
+        setSharing(false);
     }
+
+
     useEffect(() => {
         loadData();
     }, [props.fechaSemana]);
@@ -317,7 +368,7 @@ export default (props: ProgramaViewerProps) => {
                 layout="vertical"
                 onFieldsChange={onFieldsChange}
                 form={form}
-                onFinish={(programa) => save(programa)}
+                /*onFinish={(programa) => save(programa)}*/
             >
                 <Tabs style={{ paddingBottom: 20 }}>
                     {(["ENTRE_SEMANA", "FIN_SEMANA"] as ReunionAsignacion[]).map(
@@ -348,7 +399,7 @@ export default (props: ProgramaViewerProps) => {
                                                                 <div className="html"
                                                                     dangerouslySetInnerHTML={{ __html: i.DescripcionHtml }}></div>
 
-                                                                {((i.MultiSala ? ['PRINCIPAL', 'AUXILIAR_1', 'AUXILIAR_2'] : ['PRINCIPAL']) as SalaAsignacion[])
+                                                                {((i.MultiSala ? ['PRINCIPAL', 'AUXILIAR_1'/*, 'AUXILIAR_2'*/] : ['PRINCIPAL']) as SalaAsignacion[])
                                                                     .map((sala) =>
                                                                         <div key={sala}>
                                                                             {i.MultiSala &&
@@ -361,6 +412,7 @@ export default (props: ProgramaViewerProps) => {
                                                                                     name={["Asignaciones", reunion, i.Descripcion, sala, "PublicadorAsignadoId"]}
                                                                                     style={{ margin: 0 }} >
                                                                                     <PublicadorSelect
+                                                                                        /*onChange={(publicadorId:number)=>saveAsignacion(i, reunion, sala)}*/
                                                                                         publicadores={publicadoresResponse?.data?.value}
                                                                                         tipoAsignacion={i.Tipo}
                                                                                         tiposResponsabilidadExcluidos={i.TiposResponsabilidadExcluidos}
@@ -421,7 +473,8 @@ export default (props: ProgramaViewerProps) => {
                 </Tabs>
 
 
-                <Button loading={loading || saving} htmlType="submit">Guardar</Button>
+                {/*props.onSave && <Button loading={loading || saving} htmlType="submit">Guardar</Button>*/}
+                {props.onShare && <Button loading={sharing} icon={<ShareAltOutlined/>} onClick={onShare}>Compartir</Button>}
             </Form>
 
         </Viewer>

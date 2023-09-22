@@ -1,4 +1,4 @@
-import axios, { Axios, AxiosError } from 'axios';
+import axios, { Axios, AxiosError, AxiosInstance } from 'axios';
 
 export interface Model
 {
@@ -38,6 +38,7 @@ export interface ApiProps {
 }
 export type Api = 
 {
+    axiosInstance:AxiosInstance
     list:<TResponse>(query?:Query,extraQs?:string[]) => Promise<ActionResult<TResponse[]>>
     save:<TData extends Partial<Model>,TResponse>(data:TData, putForUpdate?:boolean) => Promise<ActionResult<TResponse>>,
     delete:<TResponse>(id:number) => Promise<ActionResult<TResponse>>
@@ -92,6 +93,7 @@ export default (props:ApiProps):Api => {
 
     
     return {
+        axiosInstance,
         async list<TResponse>(query?: Query,extraQuery?:string[]) {
 
             let qs = queryToString(query ?? {});

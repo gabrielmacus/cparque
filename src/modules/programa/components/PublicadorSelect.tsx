@@ -2,6 +2,17 @@ import { Select } from "antd";
 import moment from "moment";
 import { Asignacion } from "../../asignaciones/useAsignacionesApi";
 import { Publicador } from "../../publicadores/usePublicadoresApi";
+import styled from "styled-components";
+
+const DatosPublicador = styled.div`
+& > .nombre-publicador
+{
+}
+& .fecha-ultima-asignacion
+{
+    font-style:italic
+}
+`
 
 export interface PublicadorSelectProps { 
     publicadores?:Publicador[]
@@ -34,9 +45,9 @@ export default (props: PublicadorSelectProps) => {
             loading={!props.publicadores}
             showSearch
             filterOption={(input, option) => {
-                const fullName: string = option?.children?.[0]?.props?.children.join("")
+                const fullName: string = option?.['data-nombre-publicador'];//option?.children?.[0]?.props?.children.join("")
                 //@ts-ignore
-                return fullName.toLowerCase().includes(input.toLowerCase())
+                return fullName?.toLowerCase().includes(input.toLowerCase())
             }
             }
             value={props.value}
@@ -47,16 +58,21 @@ export default (props: PublicadorSelectProps) => {
                 ?.sort(orderPublicadoresByFechaAsignacion(props.tipoAsignacion))
                 .filter(p => !props.tiposResponsabilidadExcluidos?.includes(p.ResponsabilidadTipo))
                 .map(p =>
-                    <Select.Option key={p.Id} value={p.Id}>
-                        <div>{p.Apellido} {p.Nombre}</div>
-                        <strong>
-                            Última asignación:
-                        </strong>
-                        <div>
-                            {p.Asignaciones?.length ?
-                                `${p.Asignaciones[0].IntervencionAsignada_Tipo} - Semana del ${moment(p.Asignaciones[0].IntervencionAsignada_FechaSemana).format("D/M/YYYY")} (${moment(p.Asignaciones[0].IntervencionAsignada_FechaSemana).fromNow()})`
-                                : "-"}
-                        </div>
+                    <Select.Option key={p.Id} value={p.Id} data-nombre-publicador={`${p.Apellido} ${p.Nombre}`}>
+                        <DatosPublicador>
+                            <div className="nombre-publicador">{p.Apellido} {p.Nombre}</div>
+                            <strong className="titulo-ultima-asignacion">
+                                Última asignación:
+                            </strong>
+                            {(p.Asignaciones?.length  ?? 0)> 0 && <div>
+                                <div>
+                                    {p.Asignaciones![0].IntervencionAsignada_Tipo}
+                                </div>
+                                <div className="fecha-ultima-asignacion">
+                                    Semana del {moment(p.Asignaciones![0].IntervencionAsignada_FechaSemana).format("D/M/YYYY")} ({moment(p.Asignaciones![0].IntervencionAsignada_FechaSemana).fromNow()})
+                                </div>
+                            </div>}
+                        </DatosPublicador>
                     </Select.Option>)}
         </Select>
         </>
