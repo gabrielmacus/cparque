@@ -244,6 +244,11 @@ export default (props: ProgramaViewerProps) => {
                 reunionCorrespondiente: 'ENTRE_SEMANA'
             },
             {
+                name: "ESTUDIO DE LA ATALAYA",
+                intervenciones: response.data?.value.filter(i => i.Seccion == 'Estudio de La Atalaya' && i.ReunionCorrespondiente == 1) ?? [],
+                reunionCorrespondiente: 'FIN_SEMANA'
+            },
+            {
                 name: "CONCLUSIÓN",
                 intervenciones: response.data?.value.filter(i => i.Seccion == 'Conclusión' && i.ReunionCorrespondiente == 1) ?? [],
                 reunionCorrespondiente: 'FIN_SEMANA'
