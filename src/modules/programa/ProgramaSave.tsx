@@ -1,4 +1,4 @@
-import { Button, DatePicker, Form, Input, notification, Radio, Select, Space, Spin } from "antd";
+import { Button, DatePicker, Form, Input, notification, Radio, Select, Space, Spin, Modal } from "antd";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import DataSave from "../common/components/DataSave";
@@ -23,41 +23,57 @@ moment.updateLocale('es-mx', {
 });
 
 export default () => {
+    const [shareModalOpened, setShareModalOpened] = useState(false);
+    const [sharePreviewUrl, setSharePreviewUrl] = useState<string>();
+
     const [fechaSemana, setFechaSemana] = useState<Date | null | undefined>(moment().startOf("week").toDate());
     const [notificationApi, notificationContext] = notification.useNotification();
     const asignacionesApi = useAsignacionesApi();
     const programaApi = useProgramaApi();
 
-    const onShare = async () => {
+    const share = async () => {
         const fechaSemanaMoment = moment(fechaSemana);
+        let file:File;
         try {
-            const file = await programaApi.generateImage(fechaSemanaMoment);
+            file = await programaApi.generateImage(fechaSemanaMoment);
 
             const shareData: ShareData = {
                 title: `Programa ${fechaSemanaMoment.format("DD-MM-YYYY")}`,
                 files: [file]
             };
 
-            if (navigator.canShare(shareData)) {
-                await navigator.share(shareData);
-            }
-            else {
-                const url = URL.createObjectURL(file)
+            await navigator.share(shareData);
+            setShareModalOpened(false);
+        }
+        catch (e) {
+
+            try
+            {
                 const a = document.createElement("a");
-                a.download = file.name;
-                a.href = url;
+                a.download = file!.name;
+                a.href = sharePreviewUrl!;
                 a.click();
                 document.removeChild(a);
+                setShareModalOpened(false);
+                
             }
+            catch(e)
+            {
+                notificationApi.error({
+                    message: `Error al compartir el programa. Contacte un administrador`,
+                    placement: 'bottomRight'
+                });
+                console.error(e)
+            }
+            console.error(e);
         }
-        catch
-        {
-            notificationApi.error({
-                message: `Error al compartir el programa. Contacte un administrador`,
-                placement: 'bottomRight'
-            });
-            return;
-        }
+    }
+    const generateImage = async () => {
+        const fechaSemanaMoment = moment(fechaSemana);
+        const file = await programaApi.generateImage(fechaSemanaMoment);
+        setSharePreviewUrl(URL.createObjectURL(file));
+        setShareModalOpened(true);
+
 
 
     }
@@ -118,8 +134,10 @@ export default () => {
                 allowClear={false}
                 locale={locale}
                 picker="week" />
-            {fechaSemana && <ProgramaViewer onShare={onShare} onSaveAsignacion={onSaveAsignacion} fechaSemana={fechaSemana} />}
-
+            {fechaSemana && <ProgramaViewer onShare={generateImage} onSaveAsignacion={onSaveAsignacion} fechaSemana={fechaSemana} />}
+            <Modal title="Compartir programa" okText="Aceptar" onCancel={()=>setShareModalOpened(false)} onOk={share} cancelText="Cancelar" visible={shareModalOpened}>
+                {sharePreviewUrl && <div style={{ maxHeight: "60vh", overflow: "auto" }}><img style={{ width: "100%" }} src={sharePreviewUrl} /></div>}
+            </Modal>
         </MainLayout>
     );
 };
